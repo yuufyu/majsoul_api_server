@@ -1,6 +1,6 @@
-# mjapi
+# Majsoul API Server
 
-Majsoul API
+Majsoul API Server
 
 ## Usage
 ---
