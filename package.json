@@ -1,7 +1,7 @@
 {
-  "name": "majsoul_server",
+  "name": "majsoul_api_server",
   "version": "1.0.0",
-  "description": "majsoul server",
+  "description": "majsoul api server",
   "main": "index.js",
   "dependencies": {
     "koa": "^2.13.1",
