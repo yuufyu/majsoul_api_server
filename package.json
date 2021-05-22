@@ -1,0 +1,19 @@
+{
+  "name": "majsoul_server",
+  "version": "1.0.0",
+  "description": "majsoul server",
+  "main": "index.js",
+  "dependencies": {
+    "koa": "^2.13.1",
+    "mjsoul": "^2.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "majsoul"
+  ],
+  "author": "yuu",
+  "license": "MIT"
+}
