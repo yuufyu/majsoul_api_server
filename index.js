@@ -12,7 +12,7 @@ const config = require('./config.js');
 const mjsoul = new MjSoul(config);
 const condvar = new EventEmitter();
 
-const port = config.port || 2563;
+const port = config.port || 8080;
 const addr = config.addr || '127.0.0.1';
 
 const NOT_IMPLEMENTED_ERROR = {error: 'Not implemented.'};
