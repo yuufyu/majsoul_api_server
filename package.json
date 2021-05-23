@@ -4,6 +4,7 @@
   "description": "majsoul api server",
   "main": "index.js",
   "dependencies": {
+    "@koa/router": "^10.0.0",
     "koa": "^2.13.1",
     "mjsoul": "^2.2.0"
   },
