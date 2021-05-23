@@ -110,6 +110,7 @@ async function fetchGameRecord(game_uuid){
                 return;
             }
             ctx.body = await fetchGameRecord(game_uuid);
+            ctx.set('Cache-Control', 'public, max-age=' + 30*24*60*60);
         });
 
     app.use(router.routes());
