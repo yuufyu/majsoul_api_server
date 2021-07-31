@@ -9,7 +9,7 @@ const Router = require('@koa/router');
 const EventEmitter = require('events');
 
 const config = require('./config.js');
-const mjsoul = new MjSoul(config);
+const mjsoul = new MjSoul(config.mjsoul);
 const condvar = new EventEmitter();
 
 const port = config.port || 8080;
