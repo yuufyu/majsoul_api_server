@@ -57,8 +57,8 @@ async function fetchCustomizedContestGameRecords(unique_id, last_index){
     return records;
 }
 
-async function fetchGameRecord(game_uuid){
-    const record = await mjsoul.sendAsync('fetchGameRecord', {game_uuid: game_uuid} );
+async function fetchGameRecord(game_uuid, client_version_string){
+    const record = await mjsoul.sendAsync('fetchGameRecord', {game_uuid: game_uuid, client_version_string : client_version_string} );
     const detailRecords = mjsoul.wrapper.decode(record.data);
     const resGameRecord = mjsoul.root.lookupType(detailRecords.name.substring(4)).decode(detailRecords.data);
     const log = resGameRecord.records.map(value => {
@@ -109,7 +109,7 @@ async function fetchGameRecord(game_uuid){
                 ctx.body = { error : 'missing param `game_uuid`'};
                 return;
             }
-            ctx.body = await fetchGameRecord(game_uuid);
+            ctx.body = await fetchGameRecord(game_uuid, config.client_version_string);
             ctx.set('Cache-Control', 'public, max-age=' + 30*24*60*60);
         });
 
