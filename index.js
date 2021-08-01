@@ -7,9 +7,11 @@ const MjSoul = require('mjsoul');
 const Koa = require('koa');
 const Router = require('@koa/router');
 const EventEmitter = require('events');
+const superagent = require('superagent');
+const pb = require('protobufjs');
 
 const config = require('./config.js');
-const mjsoul = new MjSoul(config.mjsoul);
+let mjsoul;
 const condvar = new EventEmitter();
 
 const port = config.port || 8080;
@@ -24,6 +26,35 @@ function usage(){
     <pre><code>GET /record?game_uuid={game_uuid}</code></pre>
     <pre><code>GET /contest?contest_id={contest_id}</code></pre>
     </div>`;
+}
+
+async function getServerConfig(base, timeout) {
+    const getVersion = await superagent
+      .get(base + '/version.json')
+      .timeout(timeout)
+    const { version } = getVersion.body
+  
+    const getLiqiVersion = await superagent
+      .get(base + `/resversion${version}.json`)
+      .timeout(timeout)
+    const liqiVersion = getLiqiVersion.body.res['res/proto/liqi.json'].prefix
+  
+    const getLiqi = await superagent
+      .get(base + `/${liqiVersion}/res/proto/liqi.json`)
+      .timeout(timeout)
+    const liqi = getLiqi.body
+  
+    const getServiceDiscoveryServers = await superagent
+      .get(base + `/v${version}/config.json`)
+      .timeout(timeout)
+    const serviceDiscoveryServers = getServiceDiscoveryServers.body.ip[0].region_urls.map(o => o.url)
+  
+    return {
+        version,
+        liqiVersion,
+        liqi,
+        serviceDiscoveryServers,
+    }
 }
 
 async function login() {
@@ -88,6 +119,15 @@ async function fetchGameRecord(game_uuid, client_version_string){
 
 (async () => {
     console.log('--- Start App ---');
+    const scfg = await getServerConfig(config.mjsoul.base, config.mjsoul.timeout);
+    config.mjsoul.root = pb.Root.fromJSON(scfg.liqi);
+
+    config.login.client_version = {
+        resource : scfg.version,
+    }
+    config.login.client_version_string = 'web-' + scfg.version.replace(/\.w$/, '');
+
+    mjsoul = new MjSoul(config.mjsoul);
     mjsoul.on('NotifyAccountLogout', login);
     mjsoul.open(login);
 
@@ -124,7 +164,7 @@ async function fetchGameRecord(game_uuid, client_version_string){
                 ctx.body = { error : 'missing param `game_uuid`'};
                 return;
             }
-            ctx.body = await fetchGameRecord(game_uuid, config.client_version_string);
+            ctx.body = await fetchGameRecord(game_uuid, config.login.client_version_string);
             ctx.set('Cache-Control', 'public, max-age=' + 30*24*60*60);
         });
 
