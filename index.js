@@ -61,13 +61,28 @@ async function fetchGameRecord(game_uuid, client_version_string){
     const record = await mjsoul.sendAsync('fetchGameRecord', {game_uuid: game_uuid, client_version_string : client_version_string} );
     const detailRecords = mjsoul.wrapper.decode(record.data);
     const resGameRecord = mjsoul.root.lookupType(detailRecords.name.substring(4)).decode(detailRecords.data);
-    const log = resGameRecord.records.map(value => {
-        const raw = mjsoul.wrapper.decode(value);
-        return {
-            'name' : raw.name.substr(4),
-            'data' : mjsoul.root.lookupType(raw.name).decode(raw.data)
-        };
-    });
+    let log;
+    if(resGameRecord.version < 210715 && resGameRecord.records.length > 0){
+        log = resGameRecord.records
+            .map(value => {
+                const raw = mjsoul.wrapper.decode(value);
+                return {
+                    'name' : raw.name.substr(4),
+                    'data' : mjsoul.root.lookupType(raw.name).decode(raw.data)
+                };
+            });
+    } else {
+        log = resGameRecord.actions
+            .filter(action => action.result && action.result.length > 0)
+            .map(action => {
+                const raw = mjsoul.wrapper.decode(action.result);
+                return {
+                    'name' : raw.name.substr(4),
+                    'data' : mjsoul.root.lookupType(raw.name).decode(raw.data)
+                };
+            });
+    }
+        
     return log;
 }
 
