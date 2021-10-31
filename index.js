@@ -126,6 +126,8 @@ async function fetchGameRecord(game_uuid, client_version_string){
         resource : scfg.version,
     }
     config.login.client_version_string = 'web-' + scfg.version.replace(/\.w$/, '');
+    
+    console.log(scfg);
 
     mjsoul = new MjSoul(config.mjsoul);
     mjsoul.on('NotifyAccountLogout', login);
